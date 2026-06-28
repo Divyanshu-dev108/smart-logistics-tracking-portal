@@ -2,13 +2,13 @@ import { motion } from "framer-motion";
 
 const variants = {
   primary:
-    "bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg shadow-emerald-500/20",
+    "bg-gradient-to-r from-emerald-400 to-emerald-600 hover:from-emerald-300 hover:to-emerald-500 text-white shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50",
 
   secondary:
-    "bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700",
+    "bg-slate-800/80 hover:bg-slate-700 text-slate-100 border border-slate-700",
 
   danger:
-    "bg-red-500 hover:bg-red-400 text-white",
+    "bg-gradient-to-r from-red-400 to-red-600 hover:from-red-300 hover:to-red-500 text-white shadow-lg shadow-red-500/30",
 
   ghost:
     "hover:bg-slate-800 text-slate-300",
@@ -30,7 +30,8 @@ export default function Button({
   return (
     <motion.button
       whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.98 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ duration: 0.15 }}
       className={`
         rounded-xl
         font-semibold

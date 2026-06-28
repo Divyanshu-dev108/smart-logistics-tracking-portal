@@ -10,6 +10,8 @@ import Trips from "./pages/Trips";
 import Tracking from "./pages/Tracking";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import Analytics from "./pages/Analytics";
+
 
 
 
@@ -27,6 +29,7 @@ export default function App() {
           <Route path="/tracking" element={<Tracking />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/analytics" element={<Analytics />} />
         </Route>
       </Routes>
     </BrowserRouter>
