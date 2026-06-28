@@ -1,48 +1,34 @@
-import Button from "./components/ui/Button";
-import Card from "./components/ui/Card";
-import Badge from "./components/ui/Badge";
-import Input from "./components/ui/Input";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import MainLayout from "./layouts/MainLayout";
+
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Drivers from "./pages/Drivers";
+import Vehicles from "./pages/Vehicles";
+import Trips from "./pages/Trips";
+import Tracking from "./pages/Tracking";
+import Reports from "./pages/Reports";
+import Settings from "./pages/Settings";
+
+
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-10">
-      <Card className="w-[500px] space-y-6">
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login />} />
 
-        <h1 className="text-3xl font-bold">
-          Manexa Design System
-        </h1>
-
-        <Input placeholder="Search vehicles..." />
-
-        <div className="flex gap-3">
-
-          <Badge variant="success">
-            Active
-          </Badge>
-
-          <Badge variant="warning">
-            Pending
-          </Badge>
-
-          <Badge variant="danger">
-            Offline
-          </Badge>
-
-        </div>
-
-        <div className="flex gap-3">
-
-          <Button>
-            Primary
-          </Button>
-
-          <Button variant="secondary">
-            Secondary
-          </Button>
-
-        </div>
-
-      </Card>
-    </div>
+        <Route element={<MainLayout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/drivers" element={<Drivers />} />
+          <Route path="/vehicles" element={<Vehicles />} />
+          <Route path="/trips" element={<Trips />} />
+          <Route path="/tracking" element={<Tracking />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
