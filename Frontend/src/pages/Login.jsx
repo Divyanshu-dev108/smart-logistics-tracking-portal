@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Truck,
-  Mail,
-  Lock,
   Eye,
   EyeOff,
   MapPinned,
   BarChart3,
   ShieldCheck,
+  UserCog,
+  User,
+  Package,
 } from "lucide-react";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
@@ -32,31 +33,85 @@ const features = [
   },
 ];
 
+const roles = [
+  {
+    id: "admin",
+    label: "Admin",
+    icon: UserCog,
+    desc: "Full platform access",
+    color: "emerald",
+    gradient: "from-emerald-400 to-emerald-600",
+    glow: "shadow-emerald-500/30",
+    ring: "ring-emerald-500",
+    text: "text-emerald-400",
+    bg: "bg-emerald-500/10",
+  },
+  {
+    id: "driver",
+    label: "Driver",
+    icon: Truck,
+    desc: "Trips & route access",
+    color: "blue",
+    gradient: "from-blue-400 to-blue-600",
+    glow: "shadow-blue-500/30",
+    ring: "ring-blue-500",
+    text: "text-blue-400",
+    bg: "bg-blue-500/10",
+  },
+  {
+    id: "customer",
+    label: "Customer",
+    icon: Package,
+    desc: "Track your shipments",
+    color: "purple",
+    gradient: "from-purple-400 to-purple-600",
+    glow: "shadow-purple-500/30",
+    ring: "ring-purple-500",
+    text: "text-purple-400",
+    bg: "bg-purple-500/10",
+  },
+];
+
+const placeholders = {
+  admin: { email: "admin@fleetflow.com", label: "Admin Portal" },
+  driver: { email: "driver@fleetflow.com", label: "Driver Portal" },
+  customer: { email: "customer@fleetflow.com", label: "Customer Portal" },
+};
+
 const Login = () => {
   const navigate = useNavigate();
+  const [selectedRole, setSelectedRole] = useState("admin");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
+
+  const activeRole = roles.find((r) => r.id === selectedRole);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    // Dummy auth — replace with real API call later
-    setTimeout(() => {
-      navigate("/dashboard");
-    }, 700);
+  const handleRoleChange = (roleId) => {
+    setSelectedRole(roleId);
+    setForm({ email: "", password: "" });
   };
+
+ // handleSubmit — route to role-specific areas
+const handleSubmit = (e) => {
+  e.preventDefault();
+  setLoading(true);
+
+  setTimeout(() => {
+    if (selectedRole === "admin") navigate("/admin/dashboard");
+    else if (selectedRole === "driver") navigate("/driver/home");
+    else navigate("/customer/home");
+  }, 800);
+};
 
   return (
     <div className="min-h-screen bg-slate-950 flex">
       {/* Left — Branding */}
       <div className="hidden lg:flex w-1/2 relative overflow-hidden flex-col justify-between p-12 border-r border-slate-800/60">
-        {/* Glow blobs */}
         <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-emerald-500/20 blur-3xl" />
         <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl" />
 
@@ -111,6 +166,23 @@ const Login = () => {
               );
             })}
           </div>
+
+          {/* Role preview pills */}
+          <div className="flex gap-3">
+            {roles.map((role) => {
+              const Icon = role.icon;
+              return (
+                <div
+                  key={role.id}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium
+                    ${role.bg} border-slate-700/50 ${role.text}`}
+                >
+                  <Icon size={13} />
+                  {role.label}
+                </div>
+              );
+            })}
+          </div>
         </motion.div>
 
         <motion.p
@@ -124,14 +196,30 @@ const Login = () => {
       </div>
 
       {/* Right — Form */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center p-6 relative">
+      <div className="flex w-full lg:w-1/2 items-center justify-center p-6 relative overflow-hidden">
+        {/* Subtle bg glow that changes with role */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={selectedRole}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className={`absolute top-0 right-0 h-72 w-72 rounded-full blur-3xl pointer-events-none
+              ${selectedRole === "admin" ? "bg-emerald-500/10" : ""}
+              ${selectedRole === "driver" ? "bg-blue-500/10" : ""}
+              ${selectedRole === "customer" ? "bg-purple-500/10" : ""}
+            `}
+          />
+        </AnimatePresence>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="w-full max-w-md"
+          className="w-full max-w-md relative z-10"
         >
-          {/* Mobile-only logo */}
+          {/* Mobile logo */}
           <div className="flex lg:hidden flex-col items-center mb-8">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/30 mb-4">
               <Truck className="text-white" size={28} />
@@ -139,52 +227,115 @@ const Login = () => {
             <h1 className="text-2xl font-bold text-white">FleetFlow</h1>
           </div>
 
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-white">Welcome back</h2>
-            <p className="text-slate-400 mt-2">
-              Sign in to access your dashboard.
-            </p>
+          {/* Heading */}
+          <div className="mb-6">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selectedRole}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.2 }}
+              >
+                <h2 className="text-3xl font-bold text-white">
+                  {placeholders[selectedRole].label}
+                </h2>
+                <p className="text-slate-400 mt-1">
+                  Sign in as{" "}
+                  <span className={activeRole.text}>
+                    {activeRole.label}
+                  </span>{" "}
+                  to continue.
+                </p>
+              </motion.div>
+            </AnimatePresence>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="relative">
-              <Mail
-                size={18}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
-              />
-              <Input
-                type="email"
-                name="email"
-                placeholder="Email address"
-                value={form.email}
-                onChange={handleChange}
-                required
-                className="pl-11"
-              />
-            </div>
+          {/* Role Selector */}
+          <div className="grid grid-cols-3 gap-3 mb-6">
+            {roles.map((role) => {
+              const Icon = role.icon;
+              const isActive = selectedRole === role.id;
 
-            <div className="relative">
-              <Lock
-                size={18}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
-              />
-              <Input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Password"
-                value={form.password}
-                onChange={handleChange}
-                required
-                className="pl-11 pr-11"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
+              return (
+                <motion.button
+                  key={role.id}
+                  type="button"
+                  onClick={() => handleRoleChange(role.id)}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className={`relative flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all duration-300
+                    ${isActive
+                      ? `${role.bg} ${role.ring} ring-1 border-transparent shadow-lg ${role.glow}`
+                      : "bg-slate-900/50 border-slate-800 hover:border-slate-600"
+                    }`}
+                >
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-300
+                      ${isActive
+                        ? `bg-gradient-to-br ${role.gradient} shadow-lg ${role.glow}`
+                        : "bg-slate-800"
+                      }`}
+                  >
+                    <Icon
+                      size={18}
+                      className={isActive ? "text-white" : "text-slate-400"}
+                    />
+                  </div>
+
+                  <div className="text-center">
+                    <p
+                      className={`text-sm font-semibold transition-colors ${
+                        isActive ? role.text : "text-slate-300"
+                      }`}
+                    >
+                      {role.label}
+                    </p>
+                    <p className="text-xs text-slate-500 leading-tight mt-0.5">
+                      {role.desc}
+                    </p>
+                  </div>
+
+                  {isActive && (
+                    <motion.div
+                      layoutId="role-indicator"
+                      className={`absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-gradient-to-br ${role.gradient}`}
+                    />
+                  )}
+                </motion.button>
+              );
+            })}
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              type="email"
+              name="email"
+              placeholder={`${activeRole.label} email address`}
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+
+            <Input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange}
+              required
+              
+              rightElement={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-slate-500 hover:text-slate-300 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              }
+            />
 
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 text-slate-400 cursor-pointer">
@@ -192,49 +343,48 @@ const Login = () => {
                 Remember me
               </label>
 
-              <a href="#" className="text-emerald-400 hover:text-emerald-300">
+              <a href="#" className={`${activeRole.text} hover:opacity-80 transition-opacity`}>
                 Forgot password?
               </a>
             </div>
 
-            <Button type="submit" className="w-full mt-2" disabled={loading}>
-              {loading ? (
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-                  className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white"
-                />
-              ) : (
-                "Sign In"
-              )}
-            </Button>
+            <motion.button
+              type="submit"
+              disabled={loading}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className={`w-full h-12 rounded-xl font-semibold text-white transition-all duration-300
+                bg-gradient-to-r ${activeRole.gradient}
+                shadow-lg ${activeRole.glow}
+                hover:shadow-xl
+                disabled:opacity-70 disabled:cursor-not-allowed
+                flex items-center justify-center mt-2`}
+            >
+              <AnimatePresence mode="wait">
+                {loading ? (
+                  <motion.div
+                    key="spinner"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+                    className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white"
+                  />
+                ) : (
+                  <motion.span
+                    key="text"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    Sign in as {activeRole.label}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.button>
           </form>
-
-          <div className="flex items-center gap-3 my-6">
-            <div className="flex-1 h-px bg-slate-800" />
-            <span className="text-slate-500 text-xs">OR CONTINUE WITH</span>
-            <div className="flex-1 h-px bg-slate-800" />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              className="flex items-center justify-center gap-2 h-11 rounded-xl border border-slate-700 bg-slate-900/60 text-slate-300 text-sm font-medium hover:bg-slate-800 transition-colors"
-            >
-              Google
-            </button>
-
-            <button
-              type="button"
-              className="flex items-center justify-center gap-2 h-11 rounded-xl border border-slate-700 bg-slate-900/60 text-slate-300 text-sm font-medium hover:bg-slate-800 transition-colors"
-            >
-              Microsoft
-            </button>
-          </div>
 
           <p className="text-center text-slate-500 text-sm mt-8">
             Don't have an account?{" "}
-            <a href="#" className="text-emerald-400 hover:text-emerald-300">
+            <a href="#" className={`${activeRole.text} hover:opacity-80 transition-opacity`}>
               Contact admin
             </a>
           </p>

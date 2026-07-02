@@ -1,12 +1,12 @@
 import { Bell, Search, UserCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 
-const Navbar = () => {
+const Navbar = ({ title = "Dashboard", subtitle = "Welcome back, Admin 👋" }) => {
   return (
     <header className="sticky top-0 z-20 h-20 border-b border-slate-800/60 bg-slate-950/60 backdrop-blur-xl px-8 flex justify-between items-center">
       <div>
-        <h2 className="text-2xl font-bold text-white">Dashboard</h2>
-        <p className="text-slate-400 text-sm">Welcome back, Admin 👋</p>
+        <h2 className="text-2xl font-bold text-white">{title}</h2>
+        <p className="text-slate-400 text-sm">{subtitle}</p>
       </div>
 
       <div className="flex items-center gap-5">
