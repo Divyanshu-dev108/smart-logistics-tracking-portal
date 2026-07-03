@@ -1,0 +1,10 @@
+{
+  "name": "smart-logistics-tracking-portal",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix Frontend run dev",
+    "dev:frontend": "npm --prefix Frontend run dev",
+    "dev:server": "npm --prefix server run dev",
+    "start": "npm --prefix server run start"
+  }
+}
