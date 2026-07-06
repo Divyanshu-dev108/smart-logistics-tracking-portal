@@ -5,11 +5,14 @@ const dotenv = require("dotenv");
 const { Server } = require("socket.io");
 
 const connectDB = require("./config/db");
+
 const authRoutes = require("./routes/authRoutes");
 const driverRoutes = require("./routes/driverRoutes");
 const tripRoutes = require("./routes/tripRoutes");
 const vehicleRoutes = require("./routes/vehicleRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+
+const setupTrackingSocket = require("./sockets/trackingSocket");
 
 dotenv.config();
 
@@ -26,6 +29,8 @@ const io = new Server(server, {
   },
 });
 
+setupTrackingSocket(io);
+
 app.set("io", io);
 
 app.use(
@@ -34,16 +39,9 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-io.on("connection", (socket) => {
-  console.log(`Socket connected: ${socket.id}`);
-
-  socket.on("disconnect", () => {
-    console.log(`Socket disconnected: ${socket.id}`);
-  });
-});
 
 app.get("/", (req, res) => {
   res.json({
@@ -61,8 +59,8 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/drivers", driverRoutes);
-app.use("/api/trips", tripRoutes);
 app.use("/api/vehicles", vehicleRoutes);
+app.use("/api/trips", tripRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 app.use((req, res) => {
@@ -79,10 +77,9 @@ app.use((error, req, res, next) => {
   }
 
   res.status(error.status || 500).json({
-    message: error.message || "Internal server error",
+    message: error.message || "Internal Server Error",
   });
 });
-
 
 const startServer = async () => {
   if (!process.env.JWT_SECRET) {
@@ -106,4 +103,8 @@ if (require.main === module) {
   });
 }
 
-module.exports = { app, server, startServer };
+module.exports = {
+  app,
+  server,
+  startServer,
+};
