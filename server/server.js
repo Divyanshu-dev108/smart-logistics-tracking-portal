@@ -9,6 +9,7 @@ const authRoutes = require("./routes/authRoutes");
 const driverRoutes = require("./routes/driverRoutes");
 const tripRoutes = require("./routes/tripRoutes");
 const vehicleRoutes = require("./routes/vehicleRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 dotenv.config();
 
@@ -62,6 +63,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/drivers", driverRoutes);
 app.use("/api/trips", tripRoutes);
 app.use("/api/vehicles", vehicleRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
@@ -80,6 +82,7 @@ app.use((error, req, res, next) => {
     message: error.message || "Internal server error",
   });
 });
+
 
 const startServer = async () => {
   if (!process.env.JWT_SECRET) {

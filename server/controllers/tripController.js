@@ -32,79 +32,168 @@ exports.getTripById = async (req, res) => {
 // Create trip
 exports.createTrip = async (req, res) => {
   try {
-    const { tripId, driver, vehicle, source, destination, revenue } = req.body;
+    const {
+      tripId,
+      driver,
+      vehicle,
+      source,
+      destination,
+      revenue,
+    } = req.body;
 
     if (!tripId || !driver || !vehicle || !source || !destination || !revenue) {
-      return res.status(400).json({ message: "All required fields must be filled" });
+      return res.status(400).json({
+        message: "All required fields must be filled",
+      });
     }
 
-    // Verify driver and vehicle exist
+    // Trip ID already exists?
+    const existingTrip = await Trip.findOne({ tripId });
+
+    if (existingTrip) {
+      return res.status(400).json({
+        message: "Trip ID already exists",
+      });
+    }
+
+    // Driver exists?
     const driverExists = await Driver.findById(driver);
+
+    if (!driverExists) {
+      return res.status(404).json({
+        message: "Driver not found",
+      });
+    }
+
+    // Vehicle exists?
     const vehicleExists = await Vehicle.findById(vehicle);
 
-    if (!driverExists || !vehicleExists) {
-      return res.status(400).json({ message: "Invalid driver or vehicle" });
+    if (!vehicleExists) {
+      return res.status(404).json({
+        message: "Vehicle not found",
+      });
     }
 
-    const trip = new Trip(req.body);
-    await trip.save();
+    // Driver already busy?
+    const activeDriverTrip = await Trip.findOne({
+      driver,
+      status: {
+        $in: ["Pending", "In Transit"],
+      },
+    });
 
-    // Update driver trip count
+    if (activeDriverTrip) {
+      return res.status(400).json({
+        message: "Driver already has an active trip",
+      });
+    }
+
+    // Vehicle already busy?
+    const activeVehicleTrip = await Trip.findOne({
+      vehicle,
+      status: {
+        $in: ["Pending", "In Transit"],
+      },
+    });
+
+    if (activeVehicleTrip) {
+      return res.status(400).json({
+        message: "Vehicle already has an active trip",
+      });
+    }
+
+    const trip = await Trip.create(req.body);
+
     await Driver.findByIdAndUpdate(driver, {
       $inc: { totalTrips: 1 },
       status: "On Trip",
     });
 
-    // Update vehicle trip count
     await Vehicle.findByIdAndUpdate(vehicle, {
       $inc: { totalTrips: 1 },
     });
 
-    res.status(201).json({ message: "Trip created successfully", trip });
+    res.status(201).json({
+      message: "Trip created successfully",
+      trip,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Failed to create trip", error: error.message });
+    if (error.code === 11000) {
+      return res.status(400).json({
+        message: "Trip ID already exists",
+      });
+    }
+
+    res.status(500).json({
+      message: "Failed to create trip",
+      error: error.message,
+    });
   }
 };
 
 // Update trip
 exports.updateTrip = async (req, res) => {
   try {
-    const trip = await Trip.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    })
+    const trip = await Trip.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
       .populate("driver")
       .populate("vehicle");
 
     if (!trip) {
-      return res.status(404).json({ message: "Trip not found" });
+      return res.status(404).json({
+        message: "Trip not found",
+      });
     }
 
-    // If trip is delivered, update driver status to available
-    if (req.body.status === "Delivered") {
+    if (trip.status === "Delivered") {
       await Driver.findByIdAndUpdate(trip.driver._id, {
         status: "Available",
       });
     }
 
-    res.status(200).json({ message: "Trip updated successfully", trip });
+    res.status(200).json({
+      message: "Trip updated successfully",
+      trip,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Failed to update trip", error: error.message });
+    res.status(500).json({
+      message: "Failed to update trip",
+      error: error.message,
+    });
   }
 };
 
 // Delete trip
 exports.deleteTrip = async (req, res) => {
   try {
-    const trip = await Trip.findByIdAndDelete(req.params.id);
+    const trip = await Trip.findById(req.params.id);
 
     if (!trip) {
-      return res.status(404).json({ message: "Trip not found" });
+      return res.status(404).json({
+        message: "Trip not found",
+      });
     }
 
-    res.status(200).json({ message: "Trip deleted successfully" });
+    await Driver.findByIdAndUpdate(trip.driver, {
+      status: "Available",
+    });
+
+    await Trip.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+      message: "Trip deleted successfully",
+    });
   } catch (error) {
-    res.status(500).json({ message: "Failed to delete trip", error: error.message });
+    res.status(500).json({
+      message: "Failed to delete trip",
+      error: error.message,
+    });
   }
 };
 
