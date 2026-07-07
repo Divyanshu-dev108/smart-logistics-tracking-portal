@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { login } from "../services/authService";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Truck,
   Eye,
@@ -364,9 +364,9 @@ const Login = () => {
                 Remember me
               </label>
 
-              <a href="#" className={`${activeRole.text} hover:opacity-80 transition-opacity`}>
+              <Link to="/forgot-password" className={`${activeRole.text} hover:opacity-80 transition-opacity`}>
                 Forgot password?
-              </a>
+              </Link>
             </div>
 
             <motion.button
@@ -405,9 +405,9 @@ const Login = () => {
 
           <p className="text-center text-slate-500 text-sm mt-8">
             Don't have an account?{" "}
-            <a href="#" className={`${activeRole.text} hover:opacity-80 transition-opacity`}>
-              Contact admin
-            </a>
+          <Link to="/register" className={`${activeRole.text} hover:opacity-80 transition-opacity`}>
+          Create account
+          </Link>
           </p>
         </motion.div>
       </div>
