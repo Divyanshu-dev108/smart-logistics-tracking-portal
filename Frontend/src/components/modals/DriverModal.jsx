@@ -6,11 +6,11 @@ import Button from "../ui/Button";
 const emptyForm = {
   name: "",
   phone: "",
-  license: "",
-  vehicle: "",
+  email: "",
+  licenseNumber: "",
+  vehicleAssigned: "",
   status: "Available",
 };
-
 export default function DriverModal({ isOpen, onClose, onSave, driver }) {
   const [form, setForm] = useState(emptyForm);
 
@@ -24,7 +24,7 @@ export default function DriverModal({ isOpen, onClose, onSave, driver }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave({ ...form, id: driver ? driver.id : Date.now() });
+    onSave(form);
     onClose();
   };
 
@@ -50,19 +50,27 @@ export default function DriverModal({ isOpen, onClose, onSave, driver }) {
           onChange={handleChange}
           required
         />
+          <Input
+            name="email"
+            type="email"
+            placeholder="Email Address"
+            value={form.email}
+            onChange={handleChange}
+            required
+        />
 
         <Input
-          name="license"
+          name="licenseNumber"
           placeholder="License Number"
-          value={form.license}
+          value={form.licenseNumber}
           onChange={handleChange}
           required
         />
 
         <Input
-          name="vehicle"
+          name="vehicleAssigned"
           placeholder="Assigned Vehicle No."
-          value={form.vehicle}
+          value={form.vehicleAssigned}
           onChange={handleChange}
         />
 

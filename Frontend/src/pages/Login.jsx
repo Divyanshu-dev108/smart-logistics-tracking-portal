@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { login } from "../services/authService";
 import {
   Truck,
   Eye,
@@ -97,15 +98,35 @@ const Login = () => {
   };
 
  // handleSubmit — route to role-specific areas
-const handleSubmit = (e) => {
+ const handleSubmit = async (e) => {
   e.preventDefault();
   setLoading(true);
 
-  setTimeout(() => {
-    if (selectedRole === "admin") navigate("/admin/dashboard");
-    else if (selectedRole === "driver") navigate("/driver/home");
-    else navigate("/customer/home");
-  }, 800);
+  try {
+    const data = await login(form.email, form.password);
+
+    alert("Login Successful");
+
+    switch (data.user.role) {
+      case "admin":
+        navigate("/admin/dashboard");
+        break;
+
+      case "driver":
+        navigate("/driver/home");
+        break;
+
+      default:
+        navigate("/customer/home");
+    }
+  } catch (error) {
+    console.log(error);
+    console.log(error.response?.data);
+
+    alert(error.response?.data?.message || "Login failed");
+  } finally {
+    setLoading(false);
+  }
 };
 
   return (

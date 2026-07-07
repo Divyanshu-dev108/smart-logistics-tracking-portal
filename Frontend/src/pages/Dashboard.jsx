@@ -4,13 +4,51 @@ import AreaChart from "../components/charts/AreaChart";
 import PieChart from "../components/charts/PieChart";
 import Card from "../components/ui/Card";
 import {
-  stats,
   revenueData,
   tripStatusData,
   recentActivity,
 } from "../data/dashboardData";
 
+import { useEffect, useState } from "react";
+import { getDashboardStats } from "../services/dashboardService";
+
 export default function Dashboard() {
+  const [stats, setStats] = useState([]);
+
+useEffect(() => {
+  loadDashboard();
+}, []);
+
+const loadDashboard = async () => {
+  try {
+    const data = await getDashboardStats();
+
+    setStats([
+      {
+        id: 1,
+        title: "Total Drivers",
+        value: data.totalDrivers,
+      },
+      {
+        id: 2,
+        title: "Total Vehicles",
+        value: data.totalVehicles,
+      },
+      {
+        id: 3,
+        title: "Total Trips",
+        value: data.totalTrips,
+      },
+      {
+        id: 4,
+        title: "Active Trips",
+        value: data.activeTrips,
+      },
+    ]);
+  } catch (err) {
+    console.log(err);
+  }
+};
   return (
     <div className="space-y-8">
       <div>

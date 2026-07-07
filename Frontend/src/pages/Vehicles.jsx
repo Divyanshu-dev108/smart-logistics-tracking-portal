@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
-import { vehicles as initialVehicles } from "../data/vehicleData";
+import { useEffect } from "react";
+import {
+  getVehicles,
+  addVehicle,
+  updateVehicle,
+  deleteVehicle,
+} from "../services/vehicleService";
 import Card from "../components/ui/Card";
 import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
@@ -14,14 +20,20 @@ const statusVariant = {
 };
 
 const Vehicles = () => {
-  const [vehicles, setVehicles] = useState(initialVehicles);
+  const [vehicles, setVehicles] = useState([]);
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   const filteredVehicles = vehicles.filter((v) =>
-    [v.number, v.type, v.driver]
+    [
+      v.registrationNumber,
+      v.vehicleType,
+      v.model,
+      v.assignedDriver?.name || "",
+      v.status,
+    ]
       .join(" ")
       .toLowerCase()
       .includes(search.toLowerCase())
@@ -37,17 +49,44 @@ const Vehicles = () => {
     setIsModalOpen(true);
   };
 
-  const handleSave = (vehicle) => {
-    setVehicles((prev) => {
-      const exists = prev.some((v) => v.id === vehicle.id);
-      return exists
-        ? prev.map((v) => (v.id === vehicle.id ? vehicle : v))
-        : [...prev, vehicle];
-    });
+  const handleSave = async (vehicle) => {
+    try {
+      if (editingVehicle) {
+        await updateVehicle(editingVehicle._id, vehicle);
+      } else {
+        await addVehicle(vehicle);
+      }
+  
+      await loadVehicles();
+      setIsModalOpen(false);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const handleDelete = (id) => {
-    setVehicles((prev) => prev.filter((v) => v.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await deleteVehicle(id);
+  
+      await loadVehicles();
+  
+      setDeleteTarget(null);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    loadVehicles();
+  }, []);
+  
+  const loadVehicles = async () => {
+    try {
+      const data = await getVehicles();
+      setVehicles(data);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -95,15 +134,15 @@ const Vehicles = () => {
             ) : (
               filteredVehicles.map((vehicle) => (
                 <tr
-                  key={vehicle.id}
+                  key={vehicle._id}
                   className="border-b border-slate-800 last:border-0 hover:bg-slate-800/40 transition-colors"
                 >
                   <td className="p-4 text-white font-medium">
-                    {vehicle.number}
+                    {vehicle.registrationNumber}
                   </td>
 
-                  <td className="p-4 text-slate-300">{vehicle.type}</td>
-                  <td className="p-4 text-slate-300">{vehicle.driver}</td>
+                  <td className="p-4 text-slate-300">{vehicle.vehicleType}</td>
+                  <td className="p-4 text-slate-300">{vehicle.assignedDriver?.name || "Not Assigned"}</td>
 
                   <td className="p-4">
                     <Badge variant={statusVariant[vehicle.status] || "info"}>
@@ -145,9 +184,9 @@ const Vehicles = () => {
       <ConfirmModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        onConfirm={() => handleDelete(deleteTarget.id)}
+        onConfirm={() => handleDelete(deleteTarget._id)}
         title="Delete Vehicle"
-        message={`Are you sure you want to remove ${deleteTarget?.number}? This cannot be undone.`}
+        message={`Are you sure you want to remove ${deleteTarget?.registrationNumber}? This cannot be undone.`}
       />
     </div>
   );

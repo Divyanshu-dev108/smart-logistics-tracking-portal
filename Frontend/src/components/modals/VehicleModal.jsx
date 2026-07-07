@@ -4,26 +4,51 @@ import Input from "../ui/Input";
 import Button from "../ui/Button";
 
 const emptyForm = {
-  number: "",
-  type: "Truck",
-  driver: "",
+  registrationNumber: "",
+  vehicleType: "Truck",
+  model: "",
+  capacity: "",
   status: "Active",
 };
 
-export default function VehicleModal({ isOpen, onClose, onSave, vehicle }) {
+export default function VehicleModal({
+  isOpen,
+  onClose,
+  onSave,
+  vehicle,
+}) {
   const [form, setForm] = useState(emptyForm);
 
   useEffect(() => {
-    setForm(vehicle ? vehicle : emptyForm);
+    if (vehicle) {
+      setForm({
+        registrationNumber: vehicle.registrationNumber || "",
+        vehicleType: vehicle.vehicleType || "Truck",
+        model: vehicle.model || "",
+        capacity: vehicle.capacity || "",
+        status: vehicle.status || "Active",
+      });
+    } else {
+      setForm(emptyForm);
+    }
   }, [vehicle, isOpen]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave({ ...form, id: vehicle ? vehicle.id : Date.now() });
+
+    onSave({
+      ...form,
+      registrationNumber: form.registrationNumber.trim(),
+      model: form.model.trim(),
+    });
+
     onClose();
   };
 
@@ -34,48 +59,71 @@ export default function VehicleModal({ isOpen, onClose, onSave, vehicle }) {
       title={vehicle ? "Edit Vehicle" : "Add Vehicle"}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
+
         <Input
-          name="number"
-          placeholder="Vehicle Number"
-          value={form.number}
+          name="registrationNumber"
+          placeholder="Registration Number"
+          value={form.registrationNumber}
           onChange={handleChange}
           required
         />
 
         <select
-          name="type"
-          value={form.type}
+          name="vehicleType"
+          value={form.vehicleType}
           onChange={handleChange}
-          className="w-full h-12 rounded-xl bg-slate-900 border border-slate-700 px-4 outline-none text-white focus:border-emerald-500 transition-all"
+          className="w-full h-12 rounded-xl bg-slate-900 border border-slate-700 px-4 text-white"
         >
           <option value="Truck">Truck</option>
           <option value="Mini Truck">Mini Truck</option>
           <option value="Container">Container</option>
+          <option value="Van">Van</option>
+          <option value="Auto">Auto</option>
         </select>
 
         <Input
-          name="driver"
-          placeholder="Assigned Driver"
-          value={form.driver}
+          name="model"
+          placeholder="Vehicle Model"
+          value={form.model}
           onChange={handleChange}
+          required
+        />
+
+        <Input
+          name="capacity"
+          type="number"
+          placeholder="Capacity (kg)"
+          value={form.capacity}
+          onChange={handleChange}
+          required
         />
 
         <select
           name="status"
           value={form.status}
           onChange={handleChange}
-          className="w-full h-12 rounded-xl bg-slate-900 border border-slate-700 px-4 outline-none text-white focus:border-emerald-500 transition-all"
+          className="w-full h-12 rounded-xl bg-slate-900 border border-slate-700 px-4 text-white"
         >
           <option value="Active">Active</option>
           <option value="Maintenance">Maintenance</option>
+          <option value="Inactive">Inactive</option>
+          <option value="Out for Repair">Out for Repair</option>
         </select>
 
         <div className="flex gap-3 pt-2">
-          <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>
+          <Button
+            type="button"
+            variant="secondary"
+            className="flex-1"
+            onClick={onClose}
+          >
             Cancel
           </Button>
 
-          <Button type="submit" className="flex-1">
+          <Button
+            type="submit"
+            className="flex-1"
+          >
             {vehicle ? "Save Changes" : "Add Vehicle"}
           </Button>
         </div>

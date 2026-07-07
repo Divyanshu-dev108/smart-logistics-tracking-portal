@@ -1,6 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+import {
+  getTrips,
+  addTrip,
+  updateTrip,
+  deleteTrip,
+} from "../services/tripService";
 import { Plus, Pencil, Trash2 } from "lucide-react";
-import { trips as initialTrips } from "../data/tripData";
 import Card from "../components/ui/Card";
 import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
@@ -15,14 +21,33 @@ const statusVariant = {
 };
 
 const Trips = () => {
-  const [trips, setTrips] = useState(initialTrips);
+  const [trips, setTrips] = useState([]);
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTrip, setEditingTrip] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  useEffect(() => {
+    loadTrips();
+  }, []);
+  
+  const loadTrips = async () => {
+    try {
+      const data = await getTrips();
+      setTrips(data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const filteredTrips = trips.filter((t) =>
-    [t.id, t.source, t.destination, t.driver, t.vehicle]
+    [
+      t.tripId,
+      t.source,
+      t.destination,
+      t.driver?.name || "",
+      t.vehicle?.registrationNumber || "",
+      t.status,
+    ]
       .join(" ")
       .toLowerCase()
       .includes(search.toLowerCase())
@@ -38,17 +63,34 @@ const Trips = () => {
     setIsModalOpen(true);
   };
 
-  const handleSave = (trip) => {
-    setTrips((prev) => {
-      const exists = prev.some((t) => t.id === trip.id);
-      return exists
-        ? prev.map((t) => (t.id === trip.id ? trip : t))
-        : [...prev, trip];
-    });
+  const handleSave = async (trip) => {
+    try {
+      if (editingTrip) {
+        await updateTrip(editingTrip._id, trip);
+      } else {
+        await addTrip(trip);
+      }
+  
+      await loadTrips();
+  
+      setIsModalOpen(false);
+  
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const handleDelete = (id) => {
-    setTrips((prev) => prev.filter((t) => t.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await deleteTrip(id);
+  
+      await loadTrips();
+  
+      setDeleteTarget(null);
+  
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -98,14 +140,14 @@ const Trips = () => {
             ) : (
               filteredTrips.map((trip) => (
                 <tr
-                  key={trip.id}
+                  key={trip._id}
                   className="border-b border-slate-800 last:border-0 hover:bg-slate-800/40 transition-colors"
                 >
-                  <td className="p-4 text-white font-medium">{trip.id}</td>
+                  <td className="p-4 text-white font-medium">{trip.tripId}</td>
                   <td className="p-4 text-slate-300">{trip.source}</td>
                   <td className="p-4 text-slate-300">{trip.destination}</td>
-                  <td className="p-4 text-slate-300">{trip.driver}</td>
-                  <td className="p-4 text-slate-300">{trip.vehicle}</td>
+                  <td className="p-4 text-slate-300">{trip.driver?.name || "Unknown"}</td>
+                  <td className="p-4 text-slate-300">{trip.vehicle?.registrationNumber || "Unknown"}</td>
 
                   <td className="p-4">
                     <Badge variant={statusVariant[trip.status] || "info"}>
@@ -147,9 +189,9 @@ const Trips = () => {
       <ConfirmModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        onConfirm={() => handleDelete(deleteTarget.id)}
+        onConfirm={() => handleDelete(deleteTarget._id)}
         title="Delete Trip"
-        message={`Are you sure you want to delete trip ${deleteTarget?.id}? This cannot be undone.`}
+        message={`Are you sure you want to delete trip ${deleteTarget?.tripId}? This cannot be undone.`}
       />
     </div>
   );

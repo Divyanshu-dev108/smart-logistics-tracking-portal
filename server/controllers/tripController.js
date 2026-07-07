@@ -32,84 +32,62 @@ exports.getTripById = async (req, res) => {
 // Create trip
 exports.createTrip = async (req, res) => {
   try {
-    const {
+    let {
       tripId,
       driver,
       vehicle,
       source,
       destination,
       revenue,
+      status,
     } = req.body;
 
-    if (!tripId || !driver || !vehicle || !source || !destination || !revenue) {
-      return res.status(400).json({
-        message: "All required fields must be filled",
-      });
+    if (!tripId) {
+      tripId = `TR${Date.now()}`;
     }
 
-    // Trip ID already exists?
-    const existingTrip = await Trip.findOne({ tripId });
-
-    if (existingTrip) {
-      return res.status(400).json({
-        message: "Trip ID already exists",
-      });
+    if (!revenue) {
+      revenue = 0;
     }
 
-    // Driver exists?
-    const driverExists = await Driver.findById(driver);
-
-    if (!driverExists) {
+    // Driver can be name or ObjectId
+    let driverDoc = await Driver.findOne({
+      name: driver.trim(),
+    });
+    
+    if (!driverDoc) {
       return res.status(404).json({
         message: "Driver not found",
       });
     }
 
-    // Vehicle exists?
-    const vehicleExists = await Vehicle.findById(vehicle);
-
-    if (!vehicleExists) {
+    // Vehicle can be registration number or ObjectId
+    let vehicleDoc = await Vehicle.findOne({
+      registrationNumber: vehicle.trim(),
+    });
+    
+    if (!vehicleDoc) {
       return res.status(404).json({
         message: "Vehicle not found",
       });
     }
 
-    // Driver already busy?
-    const activeDriverTrip = await Trip.findOne({
-      driver,
-      status: {
-        $in: ["Pending", "In Transit"],
-      },
+    const trip = await Trip.create({
+      tripId,
+      driver: driverDoc._id,
+      vehicle: vehicleDoc._id,
+      source,
+      destination,
+      revenue,
+      status,
     });
 
-    if (activeDriverTrip) {
-      return res.status(400).json({
-        message: "Driver already has an active trip",
-      });
-    }
-
-    // Vehicle already busy?
-    const activeVehicleTrip = await Trip.findOne({
-      vehicle,
-      status: {
-        $in: ["Pending", "In Transit"],
-      },
-    });
-
-    if (activeVehicleTrip) {
-      return res.status(400).json({
-        message: "Vehicle already has an active trip",
-      });
-    }
-
-    const trip = await Trip.create(req.body);
-
-    await Driver.findByIdAndUpdate(driver, {
+    await Driver.findByIdAndUpdate(driverDoc._id, {
       $inc: { totalTrips: 1 },
       status: "On Trip",
     });
 
-    await Vehicle.findByIdAndUpdate(vehicle, {
+    await Vehicle.findByIdAndUpdate(vehicleDoc._id, {
       $inc: { totalTrips: 1 },
     });
 
@@ -117,12 +95,9 @@ exports.createTrip = async (req, res) => {
       message: "Trip created successfully",
       trip,
     });
+
   } catch (error) {
-    if (error.code === 11000) {
-      return res.status(400).json({
-        message: "Trip ID already exists",
-      });
-    }
+    console.error(error);
 
     res.status(500).json({
       message: "Failed to create trip",
@@ -130,7 +105,6 @@ exports.createTrip = async (req, res) => {
     });
   }
 };
-
 // Update trip
 exports.updateTrip = async (req, res) => {
   try {

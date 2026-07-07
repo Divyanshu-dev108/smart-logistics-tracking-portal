@@ -1,12 +1,19 @@
 import { useState } from "react";
 import { Plus, Phone, IdCard, Pencil, Trash2 } from "lucide-react";
-import { drivers as initialDrivers } from "../data/driverData";
+
 import Card from "../components/ui/Card";
 import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import DriverModal from "../components/modals/DriverModal";
 import ConfirmModal from "../components/modals/ConfirmModal";
+import { useEffect } from "react";
+import {
+  getDrivers,
+  addDriver,
+  updateDriver,
+  deleteDriver,
+} from "../services/driverService";
 
 const statusVariant = {
   Available: "success",
@@ -14,14 +21,20 @@ const statusVariant = {
 };
 
 const Drivers = () => {
-  const [drivers, setDrivers] = useState(initialDrivers);
+  const [drivers, setDrivers] = useState([]);
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDriver, setEditingDriver] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   const filteredDrivers = drivers.filter((d) =>
-    [d.name, d.phone, d.license, d.vehicle]
+    [
+      d.name,
+      d.phone,
+      d.email,
+      d.licenseNumber,
+      d.status,
+    ]
       .join(" ")
       .toLowerCase()
       .includes(search.toLowerCase())
@@ -37,18 +50,42 @@ const Drivers = () => {
     setIsModalOpen(true);
   };
 
-  const handleSave = (driver) => {
-    setDrivers((prev) => {
-      const exists = prev.some((d) => d.id === driver.id);
-      return exists
-        ? prev.map((d) => (d.id === driver.id ? driver : d))
-        : [...prev, driver];
-    });
+  const handleSave = async (driver) => {
+    try {
+      if (editingDriver) {
+        await updateDriver(driver._id, driver);
+      } else {
+        await addDriver(driver);
+      }
+  
+      await loadDrivers();
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleDelete = (id) => {
-    setDrivers((prev) => prev.filter((d) => d.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await deleteDriver(id);
+      await loadDrivers();
+      setDeleteTarget(null);
+    } catch (error) {
+      console.error(error);
+    }
   };
+  
+  const loadDrivers = async () => {
+    try {
+      const data = await getDrivers();
+      setDrivers(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  useEffect(() => {
+    loadDrivers();
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -96,7 +133,7 @@ const Drivers = () => {
             ) : (
               filteredDrivers.map((driver) => (
                 <tr
-                  key={driver.id}
+                  key={driver._id}
                   className="border-b border-slate-800 last:border-0 hover:bg-slate-800/40 transition-colors"
                 >
                   <td className="p-4 text-white font-medium">{driver.name}</td>
@@ -111,11 +148,11 @@ const Drivers = () => {
                   <td className="p-4 text-slate-300">
                     <span className="flex items-center gap-2">
                       <IdCard size={14} className="text-slate-500" />
-                      {driver.license}
+                      {driver.licenseNumber}
                     </span>
                   </td>
 
-                  <td className="p-4 text-slate-300">{driver.vehicle}</td>
+                  <td className="p-4 text-slate-300">{driver.vehicleAssigned?.vehicleNumber || "Not Assigned"}</td>
 
                   <td className="p-4">
                     <Badge variant={statusVariant[driver.status] || "info"}>
@@ -157,7 +194,7 @@ const Drivers = () => {
       <ConfirmModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        onConfirm={() => handleDelete(deleteTarget.id)}
+        onConfirm={() => handleDelete(deleteTarget._id)}
         title="Delete Driver"
         message={`Are you sure you want to remove ${deleteTarget?.name}? This cannot be undone.`}
       />
