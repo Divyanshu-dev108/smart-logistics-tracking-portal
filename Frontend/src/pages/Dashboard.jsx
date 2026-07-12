@@ -6,6 +6,7 @@ import ActivityCard from "../components/cards/ActivityCard";
 import AreaChart from "../components/charts/AreaChart";
 import PieChart from "../components/charts/PieChart";
 import Card from "../components/ui/Card";
+import Skeleton from "../components/ui/Skeleton";
 import DataMesh3D from "../components/3d/DataMesh3D";
 import { getDashboardStats } from "../services/dashboardService";
 import { revenueData, tripStatusData, recentActivity } from "../data/dashboardData";
@@ -27,12 +28,17 @@ const item = {
 
 export default function Dashboard() {
   const [stats, setStats] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     loadDashboard();
   }, []);
 
   const loadDashboard = async () => {
+    setIsLoading(true);
+    // Artificial delay to show off beautiful skeleton loaders
+    await new Promise(resolve => setTimeout(resolve, 800));
+
     try {
       const data = await getDashboardStats();
       setStats([
@@ -48,6 +54,8 @@ export default function Dashboard() {
         { id: 3, title: "Running Trips", value: 39, change: "+8%", color: "yellow" },
         { id: 4, title: "Revenue", value: "₹12.4L", change: "+16%", color: "purple" },
       ]);
+    } finally {
+      setIsLoading(false);
     }
   };
 

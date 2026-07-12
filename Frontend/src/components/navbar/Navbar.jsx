@@ -2,6 +2,7 @@ import { Bell, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import NotificationCenter from "./NotificationCenter";
 
 const pageTitles = {
   "/admin/dashboard": { title: "Dashboard", sub: "Welcome back, Admin 👋" },
@@ -57,15 +58,8 @@ const Navbar = ({ title, subtitle }) => {
           />
         </div>
 
-        {/* Bell */}
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          className="relative text-slate-400 hover:text-white transition-colors p-1"
-        >
-          <Bell size={18} />
-          <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-emerald-500 shadow shadow-emerald-500/60" />
-        </motion.button>
+        {/* Notifications */}
+        <NotificationCenter />
 
         {/* User pill */}
         <div className="flex items-center gap-2 bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-1.5">
