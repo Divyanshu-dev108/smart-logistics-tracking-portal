@@ -1,7 +1,9 @@
 import { Circle } from "lucide-react";
+import { Suspense } from "react";
 import Card from "../components/ui/Card";
 import Badge from "../components/ui/Badge";
 import VehicleMap from "../components/map/VehicleMap";
+import AbstractTruck3D from "../components/3d/AbstractTruck3D";
 import { vehicleLocations } from "../data/trackingData";
 
 const statusVariant = {
@@ -11,15 +13,19 @@ const statusVariant = {
 
 const Tracking = () => {
   return (
-    <div className="space-y-8">
-      <div>
+    <div className="relative space-y-8">
+      <Suspense fallback={null}>
+        <AbstractTruck3D />
+      </Suspense>
+
+      <div className="relative z-10">
         <h1 className="text-4xl font-bold text-white">Live Tracking</h1>
         <p className="text-slate-400 mt-2">
           Real-time location of your active fleet.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2 h-[480px] p-2">
           <VehicleMap vehicles={vehicleLocations} />
         </Card>

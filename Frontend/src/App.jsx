@@ -1,6 +1,8 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import ProtectedRoute from "./components/common/ProtectedRoute";
 
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 import AdminLayout from "./layouts/AdminLayout";
 import DriverLayout from "./layouts/DriverLayout";
@@ -17,17 +19,23 @@ import Analytics from "./pages/Analytics";
 
 import DriverHome from "./pages/driver/DriverHome";
 import CustomerHome from "./pages/customer/CustomerHome";
-import Register from "./pages/Register";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
-
         <Route path="/register" element={<Register />} />
-        {/* Admin area */}
-        <Route path="/admin" element={<AdminLayout />}>
+
+        {/* Admin only */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="drivers" element={<Drivers />} />
           <Route path="vehicles" element={<Vehicles />} />
@@ -38,20 +46,37 @@ export default function App() {
           <Route path="settings" element={<Settings />} />
         </Route>
 
-        {/* Driver area */}
-        <Route path="/driver" element={<DriverLayout />}>
+        {/* Driver only */}
+        <Route
+          path="/driver"
+          element={
+            <ProtectedRoute allowedRoles={["driver"]}>
+              <DriverLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="home" element={<DriverHome />} />
           <Route path="trips" element={<Trips />} />
           <Route path="tracking" element={<Tracking />} />
           <Route path="settings" element={<Settings />} />
         </Route>
 
-        {/* Customer area */}
-        <Route path="/customer" element={<CustomerLayout />}>
+        {/* Customer only */}
+        <Route
+          path="/customer"
+          element={
+            <ProtectedRoute allowedRoles={["customer"]}>
+              <CustomerLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="home" element={<CustomerHome />} />
           <Route path="trips" element={<Trips />} />
           <Route path="settings" element={<Settings />} />
         </Route>
+
+        {/* Catch all */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

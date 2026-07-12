@@ -1,0 +1,37 @@
+:root {
+
+  /* Background */
+
+  --bg: #0B1220;
+  --sidebar: #111827;
+  --card: #182233;
+
+  /* Text */
+
+  --text: #F8FAFC;
+  --text-secondary: #94A3B8;
+
+  /* Border */
+
+  --border: #263244;
+
+  /* Brand */
+
+  --primary: #3B82F6;
+  --primary-hover: #2563EB;
+
+  /* Status */
+
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+
+  /* Radius */
+
+  --radius:16px;
+
+  /* Shadows */
+
+  --shadow:
+      0 10px 30px rgba(0,0,0,.25);
+}

@@ -1,12 +1,23 @@
-import { Circle } from "lucide-react";
+import { Circle, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function SidebarFooter() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  };
+
   return (
     <div className="border-t border-slate-800/60 p-4">
       <div className="flex items-center gap-3 rounded-xl bg-slate-800/40 p-3">
         <div className="relative shrink-0">
           <img
-            src="https://ui-avatars.com/api/?name=Rajneesh&background=10b981&color=fff"
+            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || "User")}&background=10b981&color=fff`}
             alt="Profile"
             className="h-9 w-9 rounded-full"
           />
@@ -17,17 +28,25 @@ export default function SidebarFooter() {
           />
         </div>
 
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h3
             style={{ letterSpacing: "-0.02em" }}
             className="text-sm font-semibold text-white leading-none truncate"
           >
-            Rajneesh Kumar
+            {user?.name || "User"}
           </h3>
-          <p className="text-[10px] font-medium tracking-widest uppercase text-slate-500 mt-0.5">
-            Administrator
+          <p className="text-[10px] font-medium tracking-widest uppercase text-slate-500 mt-0.5 capitalize">
+            {user?.role || "Guest"}
           </p>
         </div>
+
+        <button
+          onClick={handleLogout}
+          className="text-slate-500 hover:text-red-400 transition-colors shrink-0"
+          title="Logout"
+        >
+          <LogOut size={16} />
+        </button>
       </div>
     </div>
   );

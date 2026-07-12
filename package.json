@@ -6,5 +6,10 @@
     "dev:frontend": "npm --prefix Frontend run dev",
     "dev:server": "npm --prefix server run dev",
     "start": "npm --prefix server run start"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
+    "three": "^0.185.1"
   }
 }

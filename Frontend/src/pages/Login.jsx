@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { login } from "../services/authService";
 import { useNavigate, Link } from "react-router-dom";
@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
+import TechGlobe from "../components/3d/TechGlobe";
 
 const features = [
   {
@@ -132,9 +133,13 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-slate-950 flex">
       {/* Left — Branding */}
-      <div className="hidden lg:flex w-1/2 relative overflow-hidden flex-col justify-between p-12 border-r border-slate-800/60">
-        <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-emerald-500/20 blur-3xl" />
-        <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl" />
+      <div className="hidden lg:flex w-1/2 relative overflow-hidden flex-col justify-between p-12 border-r border-slate-800/60 glass">
+        <Suspense fallback={null}>
+          <TechGlobe />
+        </Suspense>
+        
+        <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-emerald-500/20 blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-blue-500/10 blur-[100px] pointer-events-none" />
 
         <motion.div
           initial={{ opacity: 0, y: -10 }}

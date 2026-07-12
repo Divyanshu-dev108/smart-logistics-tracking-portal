@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { register } from "../services/authService";
@@ -15,6 +15,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import Input from "../components/ui/Input";
+import TechGlobe from "../components/3d/TechGlobe";
 
 const roles = [
   {
@@ -125,9 +126,13 @@ export default function Register() {
   return (
     <div className="min-h-screen bg-slate-950 flex">
       {/* Left panel */}
-      <div className="hidden lg:flex w-1/2 relative overflow-hidden flex-col justify-between p-12 border-r border-slate-800/60">
-        <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-emerald-500/20 blur-3xl" />
-        <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl" />
+      <div className="hidden lg:flex w-1/2 relative overflow-hidden flex-col justify-between p-12 border-r border-slate-800/60 glass">
+        <Suspense fallback={null}>
+          <TechGlobe />
+        </Suspense>
+        
+        <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-emerald-500/20 blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-blue-500/10 blur-[100px] pointer-events-none" />
 
         {/* Logo */}
         <motion.div
