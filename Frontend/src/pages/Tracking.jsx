@@ -5,7 +5,7 @@ import Badge from "../components/ui/Badge";
 import VehicleMap from "../components/map/VehicleMap";
 import AbstractTruck3D from "../components/3d/AbstractTruck3D";
 import { vehicleLocations } from "../data/trackingData";
-
+import LiveMap from "../components/map/LiveMap";
 const statusVariant = {
   Moving: "success",
   Stopped: "warning",
@@ -24,7 +24,15 @@ const Tracking = () => {
           Real-time location of your active fleet.
         </p>
       </div>
+<div className="grid grid-cols-3 gap-6">
+  <div className="col-span-2 h-[600px] rounded-3xl overflow-hidden">
+    <LiveMap />
+  </div>
 
+  <div className="col-span-1 rounded-3xl bg-slate-900 border border-slate-800 p-5">
+    {/* Vehicle List */}
+  </div>
+</div>
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2 h-[480px] p-2">
           <VehicleMap vehicles={vehicleLocations} />
