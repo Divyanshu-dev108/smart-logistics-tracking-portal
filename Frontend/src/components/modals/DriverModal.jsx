@@ -8,7 +8,7 @@ const emptyForm = {
   phone: "",
   email: "",
   licenseNumber: "",
-  vehicleAssigned: "",
+  vehicleAssigned: null,
   status: "Available",
 };
 export default function DriverModal({ isOpen, onClose, onSave, driver }) {
