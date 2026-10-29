@@ -8,8 +8,9 @@ import {
 
 export default function PieChart({ data }) {
   return (
-    <ResponsiveContainer width="100%" height={220}>
-      <RPieChart>
+    <div className="w-full h-[220px] min-w-0 overflow-hidden flex items-center justify-center">
+      <ResponsiveContainer width="100%" height="100%">
+        <RPieChart>
         <defs>
           <filter id="pieShadow" x="-20%" y="-20%" width="140%" height="140%">
             <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.4" />
@@ -24,6 +25,9 @@ export default function PieChart({ data }) {
           paddingAngle={6}
           cornerRadius={6}
           stroke="none"
+          isAnimationActive={true}
+          animationDuration={1200}
+          animationEasing="ease-out"
           style={{ filter: "url(#pieShadow)" }}
         >
           {data.map((entry, index) => (
@@ -44,5 +48,6 @@ export default function PieChart({ data }) {
         />
       </RPieChart>
     </ResponsiveContainer>
+    </div>
   );
 }

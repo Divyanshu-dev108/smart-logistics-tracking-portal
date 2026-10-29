@@ -29,7 +29,7 @@ function CyberNode() {
 
 export default function DataMesh3D() {
   return (
-    <div className="absolute right-0 top-0 w-full lg:w-[600px] h-[500px] pointer-events-none opacity-40 z-0 overflow-hidden">
+    <div className="absolute right-0 top-0 w-full max-w-[600px] h-[500px] pointer-events-none opacity-40 z-0 overflow-hidden">
       <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
         <ambientLight intensity={0.5} />
         <CyberNode />

@@ -10,8 +10,9 @@ import {
 
 export default function AreaChart({ data }) {
   return (
-    <ResponsiveContainer width="100%" height={280}>
-      <RAreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+    <div className="w-full h-[280px] min-w-0 overflow-hidden">
+      <ResponsiveContainer width="100%" height="100%">
+        <RAreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
         <defs>
           <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur stdDeviation="4" result="blur" />
@@ -62,9 +63,13 @@ export default function AreaChart({ data }) {
           strokeWidth={3}
           fill="url(#revenueGradient)"
           activeDot={{ r: 6, fill: "#10b981", stroke: "#fff", strokeWidth: 2, filter: "url(#glow)" }}
+          isAnimationActive={true}
+          animationDuration={1300}
+          animationEasing="ease-out"
           style={{ filter: "drop-shadow(0px 10px 10px rgba(16,185,129,0.3))" }}
         />
       </RAreaChart>
     </ResponsiveContainer>
+    </div>
   );
 }

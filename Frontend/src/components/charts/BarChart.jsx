@@ -32,8 +32,8 @@ export default function BarChart({ data }) {
           }}
         />
 
-        <Bar dataKey="trips" fill="#334155" radius={[6, 6, 0, 0]} name="Total Trips" />
-        <Bar dataKey="delivered" fill="#10b981" radius={[6, 6, 0, 0]} name="Delivered" />
+        <Bar dataKey="trips" fill="#334155" radius={[6, 6, 0, 0]} name="Total Trips" isAnimationActive={true} animationDuration={1200} animationEasing="ease-out" />
+        <Bar dataKey="delivered" fill="#10b981" radius={[6, 6, 0, 0]} name="Delivered" isAnimationActive={true} animationDuration={1200} animationEasing="ease-out" />
       </RBarChart>
     </ResponsiveContainer>
   );

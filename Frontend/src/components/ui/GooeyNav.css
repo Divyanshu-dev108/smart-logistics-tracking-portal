@@ -1,0 +1,92 @@
+.gooey-nav-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  user-select: none;
+}
+
+.gooey-nav-filter-svg {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.gooey-nav-track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.gooey-nav-goo-layer {
+  position: absolute;
+  inset: 0;
+  filter: url(#gooey-nav-filter);
+  pointer-events: none;
+  border-radius: 9999px;
+  overflow: visible;
+}
+
+.gooey-nav-pill {
+  position: absolute;
+  top: 4px;
+  height: calc(100% - 8px);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 9999px;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.5);
+  transition: transform cubic-bezier(0.34, 1.56, 0.64, 1), width cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform, width;
+}
+
+.gooey-nav-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.gooey-nav-items {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.gooey-nav-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 11px;
+  font-family: var(--font-display, inherit);
+  font-size: 0.775rem;
+  letter-spacing: -0.01em;
+  font-weight: 500;
+  color: #94a3b8;
+  text-decoration: none;
+  border-radius: 9999px;
+  transition: color 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.gooey-nav-item:hover {
+  color: #f8fafc;
+}
+
+.gooey-nav-item--active {
+  color: #ffffff;
+  font-weight: 600;
+}

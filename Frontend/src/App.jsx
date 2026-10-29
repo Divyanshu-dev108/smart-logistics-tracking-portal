@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 
 import Login from "./pages/Login";
@@ -19,10 +20,41 @@ import Analytics from "./pages/Analytics";
 
 import DriverHome from "./pages/driver/DriverHome";
 import CustomerHome from "./pages/customer/CustomerHome";
+import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (
     <BrowserRouter>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3500,
+          style: {
+            background: "rgba(15, 23, 42, 0.92)",
+            backdropFilter: "blur(20px)",
+            border: "1px solid rgba(16, 185, 129, 0.25)",
+            color: "#f8fafc",
+            fontFamily: "var(--font-body)",
+            fontSize: "13px",
+            fontWeight: 500,
+            borderRadius: "16px",
+            boxShadow: "0 14px 35px -10px rgba(0, 0, 0, 0.7), 0 0 20px rgba(16, 185, 129, 0.15)",
+            padding: "12px 16px",
+          },
+          success: {
+            iconTheme: {
+              primary: "#10b981",
+              secondary: "#042f2e",
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#f43f5e",
+              secondary: "#4c0519",
+            },
+          },
+        }}
+      />
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -75,8 +107,8 @@ export default function App() {
           <Route path="settings" element={<Settings />} />
         </Route>
 
-        {/* Catch all */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Catch all 404 */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

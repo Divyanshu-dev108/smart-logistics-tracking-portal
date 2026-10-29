@@ -36,8 +36,12 @@ export default function LineChart({ data }) {
           type="monotone"
           dataKey="onTime"
           stroke="#10b981"
-          strokeWidth={2}
+          strokeWidth={2.5}
           dot={{ fill: "#10b981", r: 4 }}
+          activeDot={{ r: 6, fill: "#10b981", stroke: "#fff", strokeWidth: 2 }}
+          isAnimationActive={true}
+          animationDuration={1300}
+          animationEasing="ease-out"
         />
       </RLineChart>
     </ResponsiveContainer>

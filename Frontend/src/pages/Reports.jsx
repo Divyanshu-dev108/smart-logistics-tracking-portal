@@ -1,5 +1,9 @@
-import { Download } from "lucide-react";
+import { Download, FileText, CheckCircle2, Route, Clock, Fuel } from "lucide-react";
+import toast from "react-hot-toast";
+import PageHeader from "../components/common/PageHeader";
 import Card from "../components/ui/Card";
+import SpotlightCard from "../components/ui/SpotlightCard";
+import KpiCard from "../components/ui/KpiCard";
 import Button from "../components/ui/Button";
 import BarChart from "../components/charts/BarChart";
 import LineChart from "../components/charts/LineChart";
@@ -9,52 +13,70 @@ import {
   reportSummary,
 } from "../data/reportData";
 
-const Reports = () => {
+const reportIcons = {
+  1: Route,
+  2: CheckCircle2,
+  3: Clock,
+  4: Fuel,
+};
+
+export default function Reports() {
+  const handleExport = () => {
+    toast.success("Generating quarterly performance PDF report...", {
+      icon: "📄",
+    });
+  };
+
+  const reportColors = ["emerald", "blue", "purple", "orange"];
+
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-4xl font-bold text-white">Reports</h1>
-          <p className="text-slate-400 mt-2">
-            Performance insights across your fleet.
-          </p>
-        </div>
+    <div className="space-y-7 sm:space-y-8 pb-12 w-full max-w-full min-w-0">
+      <PageHeader
+        title="Fleet Performance Reports"
+        subtitle="Consolidated delivery metrics, driver efficiency KPIs, and monthly fulfillment summaries."
+        badge="Q1 Analytics"
+        icon={FileText}
+        actions={
+          <Button variant="primary" size="sm" onClick={handleExport} starBorder={true}>
+            <Download size={15} />
+            Export PDF
+          </Button>
+        }
+      />
 
-        <Button variant="secondary">
-          <Download size={18} className="mr-2" />
-          Export PDF
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {reportSummary.map((item) => (
-          <Card key={item.id} className="space-y-3">
-            <p className="text-slate-400 text-sm">{item.title}</p>
-            <h2 className="text-3xl font-bold text-white">{item.value}</h2>
-            <span className="text-emerald-400 text-sm">
-              {item.change} vs last period
-            </span>
-          </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 min-w-0 w-full items-stretch">
+        {reportSummary.map((item, idx) => (
+          <KpiCard
+            key={item.id}
+            title={item.title}
+            value={item.value}
+            change={item.change}
+            subtitle="vs last cycle"
+            color={reportColors[idx % reportColors.length]}
+            icon={reportIcons[item.id]}
+            showSparkline={false}
+            animateValue={true}
+          />
         ))}
       </div>
 
       <Card>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
           <div>
-            <h3 className="text-lg font-semibold text-white">
-              Trips vs Delivered
+            <h3 className="text-base font-semibold text-white font-sans tracking-tight">
+              Dispatched vs Delivered Trips
             </h3>
-            <p className="text-sm text-slate-400">Monthly breakdown</p>
+            <p className="text-xs text-slate-400 mt-0.5">Month-by-month fulfillment ratio</p>
           </div>
 
-          <div className="flex items-center gap-4 text-sm">
-            <span className="flex items-center gap-2 text-slate-300">
+          <div className="flex items-center gap-4 text-xs">
+            <span className="flex items-center gap-2 text-slate-300 font-medium">
               <span className="h-2.5 w-2.5 rounded-full bg-slate-600" />
-              Total
+              Total Dispatched
             </span>
-            <span className="flex items-center gap-2 text-slate-300">
+            <span className="flex items-center gap-2 text-slate-300 font-medium">
               <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-              Delivered
+              Successfully Delivered
             </span>
           </div>
         </div>
@@ -64,10 +86,12 @@ const Reports = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
-          <h3 className="text-lg font-semibold text-white mb-1">
-            Driver On-Time Performance
-          </h3>
-          <p className="text-sm text-slate-400 mb-4">% of trips on time</p>
+          <div className="mb-4">
+            <h3 className="text-base font-semibold text-white font-sans tracking-tight">
+              Driver On-Time Reliability
+            </h3>
+            <p className="text-xs text-slate-400 mt-0.5">Percentage of deliveries completed within SLA</p>
+          </div>
 
           <LineChart
             data={driverPerformance.map((d) => ({
@@ -78,36 +102,42 @@ const Reports = () => {
         </Card>
 
         <Card>
-          <h3 className="text-lg font-semibold text-white mb-4">
-            Top Drivers
-          </h3>
+          <div className="mb-4">
+            <h3 className="text-base font-semibold text-white font-sans tracking-tight">
+              Top Ranked Drivers
+            </h3>
+            <p className="text-xs text-slate-400 mt-0.5">Ranked by completed trip count & SLA rate</p>
+          </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {driverPerformance
               .sort((a, b) => b.trips - a.trips)
               .map((driver, index) => (
                 <div
                   key={driver.name}
-                  className="flex items-center justify-between rounded-xl bg-slate-800/50 p-3"
+                  className="flex items-center justify-between rounded-xl bg-slate-800/40 border border-slate-800/70 p-3 hover:bg-slate-800/60 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 text-sm font-semibold">
-                      {index + 1}
+                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-800 border border-slate-700/80 text-emerald-400 text-xs font-bold font-display">
+                      #{index + 1}
                     </span>
 
                     <div>
-                      <p className="text-sm font-medium text-white">
+                      <p className="text-sm font-semibold text-white font-display">
                         {driver.name}
                       </p>
-                      <p className="text-xs text-slate-400">
-                        {driver.trips} trips
+                      <p className="text-xs text-slate-400 tabular-nums">
+                        {driver.trips} completed trips
                       </p>
                     </div>
                   </div>
 
-                  <span className="text-emerald-400 text-sm font-semibold">
-                    {driver.onTime}%
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 size={14} className="text-emerald-400" />
+                    <span className="text-emerald-400 text-sm font-bold tabular-nums font-display">
+                      {driver.onTime}%
+                    </span>
+                  </div>
                 </div>
               ))}
           </div>
@@ -115,6 +145,4 @@ const Reports = () => {
       </div>
     </div>
   );
-};
-
-export default Reports;
+}
